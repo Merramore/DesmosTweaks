@@ -7,11 +7,13 @@
 // @include     https://www.desmos.com/calculator?*
 // @run-at      document-idle
 // @author      [AM]
-// @version     20200510
+// @version     20210522
 // @grant       none
 // ==/UserScript==
 
 // Changelog
+// 20210522
+//   Wait for Calc to exist before loading.
 // 20200726
 //   Git prep
 //   Removed old body replacement attempt
@@ -51,7 +53,7 @@ tweaks = {
   cloudfront_autoreload: true,
 };
 
-if (true) {
+function loadTweaks () {
   var most_recent_JSON;
   var getState_proxy, setState_proxy1;
   var api_elem;
@@ -355,6 +357,15 @@ if (true) {
     })()}
   //} catch () {}
 }
+
+function waitForCalc () {
+    if (window.Calc !== undefined) {
+        loadTweaks();
+    } else {
+        setTimeout(waitForCalc, 0.1);
+    }
+}
+waitForCalc();
 
   
  //==
