@@ -357,10 +357,10 @@ function loadTweaks () {
         // =api observer=
         {
           let e = eid("tweaks-api");
-          let o = e.observer = new MutationObserver(mutations=>{
-            for (mut of muts) {
-              assert(mut.target === e);
-              assert(mut.type == 'attributes');
+          let o = e.observer = new MutationObserver(muts=>{
+            for (var mut of muts) {
+              //assert(mut.target === e);
+              //assert(mut.type == 'attributes');
               let k = mut.attributeName;
               let v = e.getAttribute(k);
               if (v !== null) {
