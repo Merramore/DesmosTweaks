@@ -112,7 +112,7 @@ function loadTweaks () {
   }
 
   function OnLoad () {
-    console.log("OnLoad()");
+    //console.log("OnLoad()");
     if(location.pathname == "/calculator") {
       let saved = state_from_url(); 
       if (saved) {
@@ -125,8 +125,10 @@ function loadTweaks () {
   }
   
   function HandleCloudfrontError () {
+    //console.log("HandleCloudfrontError()")
     const key = "tweaks__bad_calc_state";
     if (document.title == "ERROR: The request could not be satisfied") {
+      console.log("Handling Cloudfront error");
       let html = '<div id="tweaks-cloudfront-error-box" hidden>&nbsp;<h1>Tweaks: <span id="tweaks-cloudfront-error-summary"></span></h1><p><span id="tweaks-cloudfront-error-comment">Unknown error.</span></p></div>';
       let e = eid("tweaks-cloudfront-error-comment");
       let show = (msg1 = "", msg2 = "") => {
@@ -179,7 +181,7 @@ function loadTweaks () {
     return false;
   }
   function CleanupCloudfrontError () {
-    console.log("CleanupCloudfrontError()");
+    //console.log("CleanupCloudfrontError()");
     // Call Cleanup ASAP after page reload, to make sure the URL data isn't lost.
     let saved = sessionStorage.getItem("tweaks__bad_calc_state");
     if (saved !== null) {
