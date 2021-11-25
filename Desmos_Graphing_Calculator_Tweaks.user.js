@@ -7,7 +7,7 @@
 // @include     https://www.desmos.com/calculator?*
 // @run-at      document-idle
 // @author      [AM]
-// @version     20210522
+// @version     20211001
 // @grant       none
 // ==/UserScript==
 
@@ -239,9 +239,12 @@ function loadTweaks () {
   }
 
   //try {
-  
-    CleanupCloudfrontError();
 
+  if (HandleCloudfrontError())
+    return true;
+  CleanupCloudfrontError();
+
+  {
     // Icons from icons8.com: "download" and "upload"
     let icon_save  = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAYElEQVQ4jWNgGOzgPyEFTJTaMDgNkMehFpc4ClBgYGB4ycDAYA/lwwLRASquQIwhNgwMDC8YGBicoAbYQDU7EaMZBuyhmv5DaQdSNGNzCdmAmxLNRAFGND7BpItFzwADADnZDmQvbGkTAAAAAElFTkSuQmCC";
     let icon_load  = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAV0lEQVQ4jWNgoDHgpkSzDQMDw0sGBgYncjTbQzX/h9IOpNr8Amrzf1JdogBVbA/l/4fSDlBxBWIMkUdi/8chTjT4T0gBEzmmDi4DBh4wovEJhjoWPQMMAP6QD2INYA/nAAAAAElFTkSuQmCC";
@@ -277,7 +280,7 @@ function loadTweaks () {
     //    //'&nbsp;'+
     //  '</span>'
     //);
-    {var add;(add=function(){
+    function addElements () {
     	var rel = select('.dcg-center-buttons');
       if (rel) {
         console.log("GOOP");
@@ -368,14 +371,24 @@ function loadTweaks () {
           });
           o.observe(e, {'attributes': true, /*attributeFilter: [],*/});
         }
-        OnLoad();
+        return true;
+      } else {
+        console.log("EEK");
+        return false;
       }
-      else if (!HandleCloudfrontError())
-        setTimeout(add,100), console.log("EEK");
-    })()}
-  //} catch () {}
-
     }
+  }
+
+  function waitForCalc () {
+      return timeout_until(()=>window.Calc !== undefined, 100);
+  }
+
+  waitForCalc().then(
+    ()=>timeout_until(addElements, 1000)
+  ).then(
+    ()=>OnLoad()
+  );
+  //} catch () {}
 }
 
 loadTweaks();
