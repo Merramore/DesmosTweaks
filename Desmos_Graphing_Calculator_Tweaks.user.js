@@ -53,6 +53,22 @@ tweaks = {
   cloudfront_autoreload: true,
 };
 
+function timeout_until (func, delay) {
+  return new Promise(function (resolve, reject) {
+    (function callback () {
+      try {
+        var success = func();
+      } catch (err) {
+        reject(err);
+      }
+      if (success)
+        resolve();
+      else
+        setTimeout(callback, delay);
+    })();
+  });
+}
+
 function loadTweaks () {
   var most_recent_JSON;
   var getState_proxy, setState_proxy1;
