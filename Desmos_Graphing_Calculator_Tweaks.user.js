@@ -7,11 +7,13 @@
 // @include     https://www.desmos.com/calculator?*
 // @run-at      document-idle
 // @author      [AM]
-// @version     20211001
+// @version     20211124
 // @grant       none
 // ==/UserScript==
 
 // Changelog
+// 20211124
+//   Add *et_calc_urlstring methods and *eturlstate API calls.
 // 20210522
 //   Wait for Calc to exist before loading.
 // 20200726
@@ -94,6 +96,9 @@ function loadTweaks () {
   function get_calc_zipstring () {
     return zip(get_calc_string());
   }
+  function get_calc_urlstring () {
+    return encode(get_calc_zipstring());
+  }
   function set_calc_string (json) {
     //Calc.setState(JSON.parse(json), {allowUndo:(function(a){a===undefined?true:a})(tweaks.loadJSON_allowUndo)});
     setState_proxy.innerText = json;
@@ -101,6 +106,9 @@ function loadTweaks () {
   }
   function set_calc_zipstring (payload) {
     set_calc_string(unzip(payload));
+  }
+  function set_calc_urlstring (payload) {
+    set_calc_zipstring(decode(payload));
   }
   function update_url (s) {
     if (s === null) {
@@ -226,11 +234,17 @@ function loadTweaks () {
     case 'getzipstate': {
       api_elem.innerText = get_calc_zipstring();
     } break;
+    case 'geturlstate': {
+      api_elem.innerText = get_calc_urlstring();
+    } break;
     case 'setstate': {
       set_calc_string(v);
     } break;
     case 'setzipstate': {
       set_calc_zipstring(v);
+    } break;
+    case 'seturlstate': {
+      set_calc_urlstring(v);
     } break;
     default:
       console.log(`Tweaks: Bad API call: k=${k}, v=${v}`);
