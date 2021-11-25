@@ -358,17 +358,11 @@ function loadTweaks () {
         setTimeout(add,100), console.log("EEK");
     })()}
   //} catch () {}
-}
 
-function waitForCalc () {
-    if (window.Calc !== undefined) {
-        loadTweaks();
-    } else {
-        setTimeout(waitForCalc, 0.1);
     }
 }
-waitForCalc();
 
+loadTweaks();
   
  //==
  // https://stackoverflow.com/questions/3640357
