@@ -91,10 +91,32 @@ function loadTweaks () {
     //update_url(s);
 */
     //;;console.log("</get_calc_string()>");
+    try {
+        JSON.parse(s);
+    } catch (e) {
+        console.warn("produced json is unparsable", e);
+    }
     return s;
   }
+  function zip_test (original, zipped) {
+    let unzipped;
+    try {
+        unzipped = unzip(zipped);
+    } catch (e) {
+        console.warn("zip produced erroneous output", e);
+        return false;
+    }
+    if (unzipped != original) {
+        console.warn("zip produced non-involutory output");
+        return false;
+    }
+    return true;
+  }
   function get_calc_zipstring () {
-    return zip(get_calc_string());
+    const s = get_calc_string();
+    const z = zip(s);
+    zip_test(s, z);
+    return r;
   }
   function get_calc_urlstring () {
     return encode(get_calc_zipstring());
