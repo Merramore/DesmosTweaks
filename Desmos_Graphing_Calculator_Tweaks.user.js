@@ -306,6 +306,7 @@ function loadTweaks () {
         '<button id="tweaks-json-helper-onChange" hidden="true" onclick=""></button>'+
         //'<script id="tweaks-json-helper-script" type="text/javascript">console.log(\'onload\'); Calc.observeEvent(\'change\', function () {document.getElementById(\'tweaks-json-helper-onChange\').click()});</script>'+
         '<span id="tweaks-api"></span>'+
+        '<script type="text/javascript">window.tweaks_api_call = function tweaks_api_call (k, v) { document.getElementById("tweaks-api").setAttribute(k, v); }</script>'+
       '</span>'
     );
     //let html_sshot = (
