@@ -7,11 +7,14 @@
 // @include     https://www.desmos.com/calculator?*
 // @run-at      document-idle
 // @author      [AM]
-// @version     20211124
+// @version     20220703
 // @grant       none
 // ==/UserScript==
 
 // Changelog
+// 202207033
+//   Warn on invalid serialized state.
+//   New app-side convenience function window.tweaks_api_call (k, v). It is UNSTABLE and likely to be moved/renamed.
 // 20211124
 //   Add *et_calc_urlstring methods and *eturlstate API calls.
 // 20210522
