@@ -11,6 +11,13 @@
 // @grant       none
 // ==/UserScript==
 
+// Independant one-liners to save/load state from browser console, eg for manual crash recovery.
+//  print to console:   console.log(JSON.stringify(Calc.getState()));
+//  paste into console: Calc.setState(JSON.parse(PASTE_HERE));
+//  save to file:   {const url = URL.createObjectURL(new Blob([JSON.stringify(Calc.getState())], {type:'application/json'})); const a = document.createElement('a'); a.href = url; a.download = "desmos.json"; document.head.appendChild(a); a.click(); a.remove; URL.revokeObjectURL(url);} 
+//  load from file: {const input = document.createElement('input'); input.type = "file"; input.oninput = ev => {const fr = new FileReader(ev.target.files); fr.oninput = s => Calc.setString(JSON.parse(s)); fr.readAsText(ev.target.files[0])}; {document.addEventListener('click', function () {document.removeEventListener('click', arguments.callee); input.click();  input.remove();});}}
+//   (click anywhere on document to activate)
+
 // Changelog
 // 20220703
 //   Warn on invalid serialized state.
