@@ -7,7 +7,7 @@
 // @include     https://www.desmos.com/calculator?*
 // @run-at      document-idle
 // @author      [AM]
-// @version     20220703
+// @version     20220724
 // @grant       none
 // ==/UserScript==
 
@@ -19,6 +19,9 @@
 //   (click anywhere on document to activate)
 
 // Changelog
+// 20220724
+//   Add commented one-liners at the top of the script.
+//   Fix typo in changelog.
 // 20220703
 //   Warn on invalid serialized state.
 //   New app-side convenience function window.tweaks_api_call (k, v). It is UNSTABLE and likely to be moved/renamed.
