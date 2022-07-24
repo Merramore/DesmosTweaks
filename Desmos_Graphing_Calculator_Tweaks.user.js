@@ -12,7 +12,7 @@
 // ==/UserScript==
 
 // Changelog
-// 202207033
+// 20220703
 //   Warn on invalid serialized state.
 //   New app-side convenience function window.tweaks_api_call (k, v). It is UNSTABLE and likely to be moved/renamed.
 // 20211124
