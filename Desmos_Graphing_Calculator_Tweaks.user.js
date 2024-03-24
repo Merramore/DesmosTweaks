@@ -19,6 +19,8 @@
 //   (click anywhere on document to activate)
 
 // Changelog
+// 20220725 2022-07-25 14:38:10.039454000 -05:00
+//  Focus state paste box after one click, not two.
 // 20220724
 //   Add commented one-liners at the top of the script.
 //   Fix typo in changelog.
@@ -376,6 +378,7 @@ function loadTweaks () {
           let e = eid('tweaks-json-paste-input');
           e.hidden = false;
           e.click();
+          e.focus();
         });
         eid("tweaks-json-paste-input").addEventListener("input", function () {
           console.log("pasted");
