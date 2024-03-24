@@ -95,19 +95,19 @@ function loadTweaks () {
   var most_recent_JSON;
   var getState_proxy, setState_proxy1;
   var api_elem;
-  var eid = id => document.getElementById(id);
-  var ecn = id => document.getElementsByClassName(id);
-  var select = selector => document.querySelector(selector);
+  const eid = id => document.getElementById(id);
+  const ecn = id => document.getElementsByClassName(id);
+  const select = selector => document.querySelector(selector);
   function clickortouch (e, f) {e.addEventListener("click", f, false); e.addEventListener("touchend", f, false);}
   
   function get_calc_string () {
     //;;console.log("<get_calc_string()>");
-    //let s = JSON.stringify(Calc.getState());
+    //const s = JSON.stringify(Calc.getState());
     getState_proxy.click();
-    let s = getState_proxy.innerText;
+    const s = getState_proxy.innerText;
 /*
-    let S = Calc.getState();
-    let s = JSON.stringify(S);
+    const S = Calc.getState();
+    const s = JSON.stringify(S);
     //update_url(s);
 */
     //;;console.log("</get_calc_string()>");
@@ -161,26 +161,26 @@ function loadTweaks () {
     }
     //document.location.hash = payload;
     //history.replaceState(null, "", "/calculator"+"#"+payload);
-    let query = new URLSearchParams(location.search);
+    const query = new URLSearchParams(location.search);
     if (payload === null)
       query.delete("tweaks__calc_state")
     else
       query.set("tweaks__calc_state",payload);
-    let loc = `${location.pathname}?${query.toString()}${location.hash}`;
+    const loc = `${location.pathname}?${query.toString()}${location.hash}`;
     history.replaceState(null, "", loc);
     //console.log(`url set to ${loc}`);
   }
   function state_from_url () {
     match = location.search.match(/(?:[?&]tweaks__calc_state=)([^&]*)/);
     return match? unzip(decode(match[1])) : null;
-    let query = new URLSearchParams(location.search);
+    const query = new URLSearchParams(location.search);
     return unzip(query.get("tweaks__calc_state"));
   }
 
   function OnLoad () {
     //console.log("OnLoad()");
     if(location.pathname == "/calculator") {
-      let saved = state_from_url(); 
+      const saved = state_from_url();
       if (saved) {
         console.log(saved);
         set_calc_string(saved);
@@ -195,17 +195,17 @@ function loadTweaks () {
     const key = "tweaks__bad_calc_state";
     if (document.title == "ERROR: The request could not be satisfied") {
       console.log("Handling Cloudfront error");
-      let html = '<div id="tweaks-cloudfront-error-box" hidden>&nbsp;<h1>Tweaks: <span id="tweaks-cloudfront-error-summary"></span></h1><p><span id="tweaks-cloudfront-error-comment">Unknown error.</span></p></div>';
-      let e = eid("tweaks-cloudfront-error-comment");
-      let show = (msg1 = "", msg2 = "") => {
+      const html = '<div id="tweaks-cloudfront-error-box" hidden>&nbsp;<h1>Tweaks: <span id="tweaks-cloudfront-error-summary"></span></h1><p><span id="tweaks-cloudfront-error-comment">Unknown error.</span></p></div>';
+      const e = eid("tweaks-cloudfront-error-comment");
+      const show = (msg1 = "", msg2 = "") => {
         eid("tweaks-cloudfront-error-summary").innerText = msg1;
         eid("tweaks-cloudfront-error-comment").innerText = msg2;
         eid("tweaks-cloudfront-error-box").hidden = false;
       };
       document.body.insertAdjacentHTML('beforeEnd', html);
 
-      let fromURL = state_from_url();
-      let fromStorage = sessionStorage.getItem(key);
+      const fromURL = state_from_url();
+      const fromStorage = sessionStorage.getItem(key);
       if (fromURL !== null) {
         if (fromStorage !== null) {
           if (fromURL == fromStorage) {
@@ -215,7 +215,7 @@ function loadTweaks () {
           }
         } else {
           // Only URL data
-          let payload = zip(fromURL);
+          const payload = zip(fromURL);
           sessionStorage.setItem(key, payload);
           if (sessionStorage.getItem(key) != payload) {
             show("Error storing URL state data into sessionStorage.");
@@ -249,9 +249,9 @@ function loadTweaks () {
   function CleanupCloudfrontError () {
     //console.log("CleanupCloudfrontError()");
     // Call Cleanup ASAP after page reload, to make sure the URL data isn't lost.
-    let saved = sessionStorage.getItem("tweaks__bad_calc_state");
+    const saved = sessionStorage.getItem("tweaks__bad_calc_state");
     if (saved !== null) {
-      let unzipped = unzip(saved);
+      const unzipped = unzip(saved);
       console.log(saved);
       console.log(unzipped);
       update_url(unzipped);
@@ -302,11 +302,11 @@ function loadTweaks () {
 
   {
     // Icons from icons8.com: "download" and "upload"
-    let icon_save  = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAYElEQVQ4jWNgGOzgPyEFTJTaMDgNkMehFpc4ClBgYGB4ycDAYA/lwwLRASquQIwhNgwMDC8YGBicoAbYQDU7EaMZBuyhmv5DaQdSNGNzCdmAmxLNRAFGND7BpItFzwADADnZDmQvbGkTAAAAAElFTkSuQmCC";
-    let icon_load  = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAV0lEQVQ4jWNgoDHgpkSzDQMDw0sGBgYncjTbQzX/h9IOpNr8Amrzf1JdogBVbA/l/4fSDlBxBWIMkUdi/8chTjT4T0gBEzmmDi4DBh4wovEJhjoWPQMMAP6QD2INYA/nAAAAAElFTkSuQmCC";
-    let icon_copy  = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAXElEQVQ4jd2SzQrAIAyDP/YIvrKyZ169uNvwsGj9gcEChUJIGmhgE07AgNIYA5IyMCB0jgTgUmRxJpVpRgxe04waPPvhFEr8yCDj64EpMuFrYqw08nPLrZxJ8yFuJ3UvowhAfiMAAAAASUVORK5CYII";
-    let icon_paste = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAi0lEQVQ4jbWSUQqAIBBEn9EJukOnjP6ii2X36TODsp8ssxWlaEBw3dnRWRd+RANMQJtb0AMGsN6qg9gAXUzAANWxt0HOxRUw+wkVkFRQIHF9HmXkNSpy/kCRS3wrMHJvorOmJbLke40In9zfLXwWSP6GL7BwDVIKUr/oeI6ySAS2zIvQgqAFhlyBJHa/ICmusFqwdgAAAABJRU5ErkJggg";
-    let html = (
+    const icon_save  = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAYElEQVQ4jWNgGOzgPyEFTJTaMDgNkMehFpc4ClBgYGB4ycDAYA/lwwLRASquQIwhNgwMDC8YGBicoAbYQDU7EaMZBuyhmv5DaQdSNGNzCdmAmxLNRAFGND7BpItFzwADADnZDmQvbGkTAAAAAElFTkSuQmCC";
+    const icon_load  = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAV0lEQVQ4jWNgoDHgpkSzDQMDw0sGBgYncjTbQzX/h9IOpNr8Amrzf1JdogBVbA/l/4fSDlBxBWIMkUdi/8chTjT4T0gBEzmmDi4DBh4wovEJhjoWPQMMAP6QD2INYA/nAAAAAElFTkSuQmCC";
+    const icon_copy  = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAXElEQVQ4jd2SzQrAIAyDP/YIvrKyZ169uNvwsGj9gcEChUJIGmhgE07AgNIYA5IyMCB0jgTgUmRxJpVpRgxe04waPPvhFEr8yCDj64EpMuFrYqw08nPLrZxJ8yFuJ3UvowhAfiMAAAAASUVORK5CYII";
+    const icon_paste = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAi0lEQVQ4jbWSUQqAIBBEn9EJukOnjP6ii2X36TODsp8ssxWlaEBw3dnRWRd+RANMQJtb0AMGsN6qg9gAXUzAANWxt0HOxRUw+wkVkFRQIHF9HmXkNSpy/kCRS3wrMHJvorOmJbLke40In9zfLXwWSP6GL7BwDVIKUr/oeI6ySAS2zIvQgqAFhlyBJHa/ICmusFqwdgAAAABJRU5ErkJggg";
+    const html = (
       '<span>'+
         '<button id="tweaks-json-saver" class="tweaks-json-button" onclick=""><img alt="Save JSON" src="'+icon_save+'"></img></button>'+
         '<a id="tweaks-json-save-link" href="" target="_blank" download="desmos.json" hidden="true">Save JSON</img></a>'+
@@ -329,8 +329,8 @@ function loadTweaks () {
         '<script type="text/javascript">window.tweaks_api_call = function tweaks_api_call (k, v) { document.getElementById("tweaks-api").setAttribute(k, v); }</script>'+
       '</span>'
     );
-    //let html_sshot = (
-    //    //'<button id="screenshot-button" onclick="let g=function(n){return document.getElementById(n)},a=g(\'screenshot-link\'),w=g(\'screenshot-width\').value,h=g(\'screenshot-height\').value;a.href=Calc.screenshot({width:w,height:h]);a.hidden=false">Take Screenshot: </button>'+
+    //const html_sshot = (
+    //    //'<button id="screenshot-button" onclick="const g=function(n){return document.getElementById(n)},a=g(\'screenshot-link\'),w=g(\'screenshot-width\').value,h=g(\'screenshot-height\').value;a.href=Calc.screenshot({width:w,height:h]);a.hidden=false">Take Screenshot: </button>'+
     //    //'<input id="screenshot-width" class="screenshot-size-input" type="number" value="512"/>'+
     //    //'<input id="screenshot-height" class="screenshot-size-input" type="number" value="512"/>'+
     //    //'<a id="screenshot-link" href="" hidden="true">Link</a>'+
@@ -345,9 +345,9 @@ function loadTweaks () {
         // =save=
         clickortouch(eid("tweaks-json-saver"), function () {
           //console.log("clicked save");
-          let a = eid('tweaks-json-save-link');
-          let s = get_calc_string();
-          let l = URL.createObjectURL(new Blob([s], {type:'application/json'}));
+          const a = eid('tweaks-json-save-link');
+          const s = get_calc_string();
+          const l = URL.createObjectURL(new Blob([s], {type:'application/json'}));
           a.href = l;
           a.download = tweaks.name || 'desmos.json';
           a.click();
@@ -359,7 +359,7 @@ function loadTweaks () {
         });
         eid("tweaks-json-load-input").addEventListener("change", function () {
           //console.log("clicked load");
-          let f = event.target.files[0], r = new FileReader();
+          const f = event.target.files[0], r = new FileReader();
           r.onload = function(){
             set_calc_string(r.result);
             //update_url(r.result);
@@ -370,8 +370,8 @@ function loadTweaks () {
         // =copy=
         clickortouch(eid("tweaks-json-copier"), function () {
           //console.log("clicked copy");
-          let a = eid('tweaks-json-save-link');
-          let s = get_calc_string();
+          const a = eid('tweaks-json-save-link');
+          const s = get_calc_string();
           navigator.clipboard.writeText(s);
         });
         // =paste=
@@ -380,16 +380,16 @@ function loadTweaks () {
           //navigator.clipboard.readText().then(function(data) {
           //  set_calc_string(data);
           //});
-          let e = eid('tweaks-json-paste-input');
+          const e = eid('tweaks-json-paste-input');
           e.hidden = false;
           e.click();
           e.focus();
         });
         eid("tweaks-json-paste-input").addEventListener("input", function () {
           console.log("pasted");
-          let data = event.target.value;
+          const data = event.target.value;
           event.target.value = "";
-          let has_err = false
+          const has_err = false
           try {
             set_calc_string(data);
           } catch (err) {
@@ -409,18 +409,18 @@ function loadTweaks () {
           //console.log("updated");
         });
         //eid("tweaks-json-helper-script").innerText = "console.log('onload'); Calc.observeEvent('change', function () {document.getElementById('tweaks-json-helper-onChange').click()});";
-        let onload = document.createElement('script');
+        const onload = document.createElement('script');
         onload.innerText = "Calc.observeEvent('change', function () {document.getElementById('tweaks-json-helper-onChange').click()});";
         eid("tweaks-json-helper-onChange").insertAdjacentElement('afterEnd', onload);
         // =api observer=
         {
-          let e = eid("tweaks-api");
-          let o = e.observer = new MutationObserver(muts=>{
+          const e = eid("tweaks-api");
+          const o = e.observer = new MutationObserver(muts=>{
             for (var mut of muts) {
               //assert(mut.target === e);
               //assert(mut.type == 'attributes');
-              let k = mut.attributeName;
-              let v = e.getAttribute(k);
+              const k = mut.attributeName;
+              const v = e.getAttribute(k);
               if (v !== null) {
                 e.removeAttribute(k);
                 TweaksAPICall(k, v);
