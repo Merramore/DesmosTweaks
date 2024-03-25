@@ -10,7 +10,7 @@
 // @include     https://www.desmos.com/3d?*
 // @run-at      document-idle
 // @author      [AM]
-// @version     20240320
+// @version     20240324
 // @grant       none
 // ==/UserScript==
 
@@ -22,6 +22,8 @@
 //   (click anywhere on document to activate)
 
 // Changelog
+// 20240324
+//  Rework element injection to be repeatable and modular.
 // 20240320 2024-07-20 18:54:03 -0500
 //  Load on 3D graphing page.
 // 20220725 2022-07-25 14:38:10.039454000 -05:00
