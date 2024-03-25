@@ -93,7 +93,7 @@ function timeout_until (func, delay) {
 
 function loadTweaks () {
   var most_recent_JSON;
-  var getState_proxy, setState_proxy1;
+  var getState_proxy, setState_proxy;
   var api_elem;
   const eid = id => document.getElementById(id);
   const ecn = id => document.getElementsByClassName(id);
