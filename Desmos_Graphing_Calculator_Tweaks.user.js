@@ -18,7 +18,7 @@
 //  print to console:   console.log(JSON.stringify(Calc.getState()));
 //  paste into console: Calc.setState(JSON.parse(PASTE_HERE));
 //  save to file:   {const url = URL.createObjectURL(new Blob([JSON.stringify(Calc.getState())], {type:'application/json'})); const a = document.createElement('a'); a.href = url; a.download = "desmos.json"; document.head.appendChild(a); a.click(); a.remove; URL.revokeObjectURL(url);} 
-//  load from file: {const input = document.createElement('input'); input.type = "file"; input.oninput = ev => {const fr = new FileReader(ev.target.files); fr.oninput = s => Calc.setString(JSON.parse(s)); fr.readAsText(ev.target.files[0])}; {document.addEventListener('click', function () {document.removeEventListener('click', arguments.callee); input.click();  input.remove();});}}
+//  load from file: {const input = document.createElement('input'); input.type = "file"; input.oninput = ev => {const fr = new FileReader(ev.target.files); fr.oninput = s => Calc.setString(JSON.parse(s)); fr.readAsText(ev.target.files[0])}; listen({document, 'click', function () {document.removeEventListener('click', arguments.callee); input.click();  input.remove();});}}
 //   (click anywhere on document to activate)
 
 // Changelog
@@ -93,6 +93,22 @@ function timeout_until (func, delay) {
   });
 }
 
+function listen (target, type, func, ...args) {
+  target.addEventListener(type, (...args) => {
+    try {
+      return func(...args);
+    } catch (err) {
+      console.error(err);
+    }
+  }, ...args)
+}
+
+function listen_types (target, types, ...args) {
+  for (const type of types) {
+    listen(target, type, ...args);
+  }
+}
+
 function loadTweaks () {
   var most_recent_JSON;
   var getState_proxy, setState_proxy;
@@ -100,12 +116,17 @@ function loadTweaks () {
   const eid = id => document.getElementById(id);
   const ecn = id => document.getElementsByClassName(id);
   const select = selector => document.querySelector(selector);
-  function clickortouch (e, f) {e.addEventListener("click", f, false); e.addEventListener("touchend", f, false);}
+  function clickortouch (e, f) {
+    listen(e, 'click', f, false);
+    listen(e, 'touchend', f, false);
+  }
 
   var _runPageScriptElement = null;
   function runPageScript (source) {
     try {
       _runPageScriptElement.innerHtml = source;
+    } catch (err) {
+      console.error(err);
     } finally {
       try {
         _runPageScriptElement.innerHtml = '';
@@ -371,7 +392,7 @@ function loadTweaks () {
                     //console.log("clicked load");
                     e.click();
                   });
-                  e.addEventListener("change", function (event) {
+                  listen(e, 'change', function (event) {
                     //console.log("clicked load");
                     const f = event.target.files[0], r = new FileReader();
                     r.onload = function(){
@@ -418,7 +439,7 @@ function loadTweaks () {
                     e.hidden = false;
                     e.focus();
                   });
-                  e.addEventListener("input", function () {
+                  listen(e, 'input', function () {
                     console.log("pasted");
                     const data = event.target.value;
                     event.target.value = "";
@@ -427,6 +448,7 @@ function loadTweaks () {
                       set_calc_string(data);
                     } catch (err) {
                       has_err = true;
+                      console.error(err);
                     }
                     if (!has_err) {
                       e.hidden = true;
