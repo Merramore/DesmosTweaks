@@ -99,6 +99,18 @@ function loadTweaks () {
   const ecn = id => document.getElementsByClassName(id);
   const select = selector => document.querySelector(selector);
   function clickortouch (e, f) {e.addEventListener("click", f, false); e.addEventListener("touchend", f, false);}
+
+  var _runPageScriptElement = null;
+  function runPageScript (source) {
+    try {
+      _runPageScriptElement.innerHtml = source;
+    } finally {
+      try {
+        _runPageScriptElement.innerHtml = '';
+      } finally {
+      }
+    }
+  }
   
   function get_calc_string () {
     //;;console.log("<get_calc_string()>");
@@ -177,6 +189,10 @@ function loadTweaks () {
     return unzip(query.get("tweaks__calc_state"));
   }
 
+  const onLoadScripts = [
+    'window.tweaks_api_call = function tweaks_api_call (k, v) { document.getElementById(\'tweaks-api\').setAttribute(k, v); }',
+    'console.log(\'onload\'); Calc.observeEvent(\'change\', function () {document.getElementById(\'tweaks-json-helper-onChange\').click()});',
+  ];
   function OnLoad () {
     //console.log("OnLoad()");
     if(location.pathname == "/calculator") {
@@ -188,6 +204,9 @@ function loadTweaks () {
       }
     }
     //Calc.observeEvent('change', function () {update_url(get_calc_string());});
+    for (const script of onLoadScripts) {
+      runPageScript(script);
+    }
   }
   
   function HandleCloudfrontError () {
@@ -306,134 +325,239 @@ function loadTweaks () {
     const icon_load  = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAV0lEQVQ4jWNgoDHgpkSzDQMDw0sGBgYncjTbQzX/h9IOpNr8Amrzf1JdogBVbA/l/4fSDlBxBWIMkUdi/8chTjT4T0gBEzmmDi4DBh4wovEJhjoWPQMMAP6QD2INYA/nAAAAAElFTkSuQmCC";
     const icon_copy  = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAXElEQVQ4jd2SzQrAIAyDP/YIvrKyZ169uNvwsGj9gcEChUJIGmhgE07AgNIYA5IyMCB0jgTgUmRxJpVpRgxe04waPPvhFEr8yCDj64EpMuFrYqw08nPLrZxJ8yFuJ3UvowhAfiMAAAAASUVORK5CYII";
     const icon_paste = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAi0lEQVQ4jbWSUQqAIBBEn9EJukOnjP6ii2X36TODsp8ssxWlaEBw3dnRWRd+RANMQJtb0AMGsN6qg9gAXUzAANWxt0HOxRUw+wkVkFRQIHF9HmXkNSpy/kCRS3wrMHJvorOmJbLke40In9zfLXwWSP6GL7BwDVIKUr/oeI6ySAS2zIvQgqAFhlyBJHa/ICmusFqwdgAAAABJRU5ErkJggg";
-    const html = (
-      '<span id="tweaks-buttons">'+
-        '<button id="tweaks-json-saver" class="tweaks-json-button" onclick=""><img alt="Save JSON" src="'+icon_save+'"></img></button>'+
-        '<a id="tweaks-json-save-link" href="" target="_blank" download="desmos.json" hidden="true">Save JSON</img></a>'+
-        
-        '<button id="tweaks-json-loader" class="tweaks-json-button" onclick=""><img alt="Load JSON" src="'+icon_load+'"></button>'+
-        '<input id="tweaks-json-load-input" onchange="" type="file" hidden="true">'+
+    const elementDefinitions = [
+      {
+        'id': 'tweaks-buttons',
+        'adjacency': 'beforeBegin',
+        'parentSelector': '.dcg-center-buttons',
+        'html': '<span id="tweaks-buttons"></span>',
+        'children': [
+          // =save=
+          {
+            'id': 'tweaks-json-saver',
+            'html': '<button id="tweaks-json-saver" class="tweaks-json-button" onclick=""><img alt="Save JSON" src="'+icon_save+'"></img></button>',
+            'children': [
+              {
+                'id': 'tweaks-json-save-link',
+                'html': '<a id="tweaks-json-save-link" href="" target="_blank" download="desmos.json" hidden="true">Save JSON</img></a>',
+                'setup': e => { // tweaks-json-save-link
+                  const b = e.parentElement; // tweaks-json-saver
+                  clickortouch(b, function (event) {
+                    //console.log("clicked save");
+                    const s = get_calc_string();
+                    const l = URL.createObjectURL(new Blob([s], {type:'application/json'}));
+                    e.href = l;
+                    e.download = tweaks.name || 'desmos.json';
+                    e.click();
+                  });
+                },
+              },
+            ]
+          },
 
-        '<button id="tweaks-json-copier" class="tweaks-json-button" onclick=""><img alt="Save JSON" src="'+icon_copy+'"></img></button>'+
-        
-        '<button id="tweaks-json-paster" class="tweaks-json-button" onclick="" style="position:relative"><img alt="Load JSON" src="'+icon_paste+'">'+
-          '<input id="tweaks-json-paste-input" onchange="" type="text" style="position:absolute; width:100%; height:100%; left:0; top:0; opacity:0.25;">'+
-        '</button>'+
+            // =load=
+          {
+            'id': 'tweaks-json-loader',
+            'html': '<button id="tweaks-json-loader" class="tweaks-json-button" onclick=""><img alt="Load JSON" src="'+icon_load+'"></button>',
+            'children': [
+              {
+                'id': 'tweaks-json-load-input',
+                'html': '<input id="tweaks-json-load-input" onchange="" type="file" hidden="true">',
+                'setup': e => { // tweaks-json-load-input
+                  const b = e.parentElement; // tweaks-json-loader
+                  clickortouch(b, function () {
+                    //console.log("clicked load");
+                    e.click();
+                  });
+                  e.addEventListener("change", function (event) {
+                    //console.log("clicked load");
+                    const f = event.target.files[0], r = new FileReader();
+                    r.onload = function(){
+                      set_calc_string(r.result);
+                      //update_url(r.result);
+                      tweaks.filename = f.name;
+                    };
+                    r.readAsText(f);
+                  }, false);
+                },
+              },
+            ],
+          },
 
-        '<button id="tweaks-json-helper-getState" hidden="true" onclick="this.innerText = JSON.stringify(Calc.getState());"></button>'+
-        '<button id="tweaks-json-helper-setState" hidden="true" onclick="Calc.setState(JSON.parse(this.innerText, {allowUndo:true}));"></button>'+
-        //'<button id="tweaks-json-helper-onChange" hidden="true" onload="console.log(\'onload\'); Calc.observeEvent(\'change\', function () {document.getElementById(\'tweaks-json-helper-onChange\').click()});" onclick=""></button>'+
-        '<button id="tweaks-json-helper-onChange" hidden="true" onclick=""></button>'+
-        //'<script id="tweaks-json-helper-script" type="text/javascript">console.log(\'onload\'); Calc.observeEvent(\'change\', function () {document.getElementById(\'tweaks-json-helper-onChange\').click()});</script>'+
-        '<span id="tweaks-api"></span>'+
-        '<script type="text/javascript">window.tweaks_api_call = function tweaks_api_call (k, v) { document.getElementById("tweaks-api").setAttribute(k, v); }</script>'+
-      '</span>'
-    );
-    //const html_sshot = (
-    //    //'<button id="screenshot-button" onclick="const g=function(n){return document.getElementById(n)},a=g(\'screenshot-link\'),w=g(\'screenshot-width\').value,h=g(\'screenshot-height\').value;a.href=Calc.screenshot({width:w,height:h]);a.hidden=false">Take Screenshot: </button>'+
-    //    //'<input id="screenshot-width" class="screenshot-size-input" type="number" value="512"/>'+
-    //    //'<input id="screenshot-height" class="screenshot-size-input" type="number" value="512"/>'+
-    //    //'<a id="screenshot-link" href="" hidden="true">Link</a>'+
-    //    //'&nbsp;'+
-    //  '</span>'
-    //);
+          // =copy=
+          {
+            'id': 'tweaks-json-copier',
+            'html': '<button id="tweaks-json-copier" class="tweaks-json-button" onclick=""><img alt="Save JSON" src="'+icon_copy+'"></img></button>',
+            'setup': e => { // tweaks-json-copier
+              clickortouch(e, function () {
+                //console.log("clicked copy");
+                const s = get_calc_string();
+                navigator.clipboard.writeText(s);
+              });
+            },
+          },
+
+          // =paste=
+          {
+            'id': 'tweaks-json-paster',
+            'html': '<button id="tweaks-json-paster" class="tweaks-json-button" onclick="" style="position:relative"><img alt="Load JSON" src="'+icon_paste+'"></button>',
+            'children': [
+              {
+                'id': 'tweaks-json-paste-input',
+                'html': '<input id="tweaks-json-paste-input" onchange="" type="text" style="position:absolute; width:100%; height:100%; left:0; top:0; opacity:0.25;">',
+                'setup': e => { // tweaks-json-paste-input
+                  const b = e.parentElement; // tweaks-json-paster
+                  clickortouch(b, function () {
+                    //console.log("clicked paste");
+                    //navigator.clipboard.readText().then(function(data) {
+                    //  set_calc_string(data);
+                    //});
+                    event.preventDefault();
+                    e.hidden = false;
+                    e.focus();
+                  });
+                  e.addEventListener("input", function () {
+                    console.log("pasted");
+                    const data = event.target.value;
+                    event.target.value = "";
+                    const has_err = false
+                    try {
+                      set_calc_string(data);
+                    } catch (err) {
+                      has_err = true;
+                    }
+                    if (!has_err) {
+                      e.hidden = true;
+                    }
+                    //update_url(r.result);
+                    //tweaks.filename = DEFAULT_FILENAME;
+                  }, false);
+                },
+              },
+            ]
+          },
+
+          // =sshot=
+          // {
+          //   'html': '<button id="screenshot-button" onclick="const g=function(n){return document.getElementById(n)},a=g(\'screenshot-link\'),w=g(\'screenshot-width\').value,h=g(\'screenshot-height\').value;a.href=Calc.screenshot({width:w,height:h]);a.hidden=false">Take Screenshot: </button>',
+          //   'children': [
+          //     {
+          //       'html': '<input id="screenshot-width" class="screenshot-size-input" type="number" value="512"/>',
+          //     }, {
+          //       'html': '<input id="screenshot-height" class="screenshot-size-input" type="number" value="512"/>',
+          //     }, {
+          //       'html': '<a id="screenshot-link" href="" hidden="true">Link</a>',
+          //       'setup': e => {
+          //       }
+          //     },
+          //   ],
+          //   //'&nbsp;',
+          //   );
+          // },
+
+          // =helpers=
+          {
+            'id': 'tweaks-json-helper-getState',
+            'html': '<button id="tweaks-json-helper-getState" hidden="true" onclick="this.innerText = JSON.stringify(Calc.getState());"></button>',
+            'setup': e => {
+              getState_proxy = eid("tweaks-json-helper-getState");
+            },
+          },
+          {
+            'id': 'tweaks-json-helper-setState',
+            'html': '<button id="tweaks-json-helper-setState" hidden="true" onclick="Calc.setState(JSON.parse(this.innerText, {allowUndo:true}));"></button>',
+            'setup': e => {
+              setState_proxy = eid("tweaks-json-helper-setState");
+            },
+          },
+          {
+            'id': 'tweaks-json-helper-onChange',
+            'html': '<button id="tweaks-json-helper-onChange" hidden="true" onclick=""></button>',
+            'setup': e => { // tweaks-json-helper-onChange
+              clickortouch(e, function () {
+                update_url(get_calc_string());
+                //console.log("updated");
+              });
+            },
+          },
+          {
+            'id': 'tweaks-json-script-helper',
+            'html': '<script id="tweaks-json-script-helper" type="text/javascript"></script>',
+            'setup': e => { // tweaks-json-helper-script
+              _runPageScriptElement = e;
+            },
+          },
+
+          // =api observer=
+          {
+            'id': 'tweaks-api',
+            'html': '<span id="tweaks-api"></span>',
+            'setup': e => { // tweaks-api
+              const o = e.observer = new MutationObserver(muts => {
+                for (const mut of muts) {
+                  //assert(mut.target === e);
+                  //assert(mut.type == 'attributes');
+                  const k = mut.attributeName;
+                  const v = e.getAttribute(k);
+                  if (v !== null) {
+                    e.removeAttribute(k);
+                    TweaksAPICall(k, v);
+                  }
+                }
+              });
+              o.observe(e, {'attributes': true, /*attributeFilter: [],*/});
+            },
+          },
+        ],
+      },
+    ];
     function addElements () {
-    	var rel = select('.dcg-center-buttons');
-      if (rel) {
-        console.log("GOOP");
-        rel.insertAdjacentHTML('beforeBegin', html);
-        // =save=
-        clickortouch(eid("tweaks-json-saver"), function () {
-          //console.log("clicked save");
-          const a = eid('tweaks-json-save-link');
-          const s = get_calc_string();
-          const l = URL.createObjectURL(new Blob([s], {type:'application/json'}));
-          a.href = l;
-          a.download = tweaks.name || 'desmos.json';
-          a.click();
-        });
-        // =load=
-        clickortouch(eid("tweaks-json-loader"), function () {
-          //console.log("clicked load");
-          eid('tweaks-json-load-input').click();
-        });
-        eid("tweaks-json-load-input").addEventListener("change", function () {
-          //console.log("clicked load");
-          const f = event.target.files[0], r = new FileReader();
-          r.onload = function(){
-            set_calc_string(r.result);
-            //update_url(r.result);
-            tweaks.filename = f.name;
-          };
-          r.readAsText(f);
-        }, false);
-        // =copy=
-        clickortouch(eid("tweaks-json-copier"), function () {
-          //console.log("clicked copy");
-          const a = eid('tweaks-json-save-link');
-          const s = get_calc_string();
-          navigator.clipboard.writeText(s);
-        });
-        // =paste=
-        clickortouch(eid("tweaks-json-paster"), function () {
-          //console.log("clicked paste");
-          //navigator.clipboard.readText().then(function(data) {
-          //  set_calc_string(data);
-          //});
-          const e = eid('tweaks-json-paste-input');
-          e.hidden = false;
-          e.click();
-          e.focus();
-        });
-        eid("tweaks-json-paste-input").addEventListener("input", function () {
-          console.log("pasted");
-          const data = event.target.value;
-          event.target.value = "";
-          const has_err = false
-          try {
-            set_calc_string(data);
-          } catch (err) {
-            has_err = true;
+      const dummyParent = document.createElement('div');
+      dummyParent.hidden = true;
+      function addElement (definition, parent) {
+        let allSucceeded = true;
+        let e = eid(definition.id);
+        if (!e) {
+          // Inconveniently, insertAdjacentHTML doesn't return the created element.
+          // Also inconveniently, setting outerHTML silently fails if e isn't in the canonical tree, not just if it has no parent, and completely replaces the outer element.
+          // That leaves us with this, which (a) only creates one dummy element per page load, (b) keeps the dummy out of the DOM most of the time, (c) is non-destructive on siblings, and (d) doesn't draw anything incomplete.
+          parent.insertAdjacentElement(definition.adjacency || 'beforeEnd', dummyParent);
+          dummyParent.insertAdjacentHTML('beforeEnd', definition.html);
+          e = dummyParent.lastElementChild;
+          dummyParent.parentElement.replaceChild(e, dummyParent);
+
+          const setup = definition.setup;
+          if (setup) {
+            setup(e);
           }
-          if (!has_err) {
-            eid('tweaks-json-paste-input').hidden = true;
-          }
-          //update_url(r.result);
-          //tweaks.filename = DEFAULT_FILENAME;
-        }, false);
-        // =helpers=
-        getState_proxy = eid("tweaks-json-helper-getState");
-        setState_proxy = eid("tweaks-json-helper-setState");
-        clickortouch(eid("tweaks-json-helper-onChange"), function () {
-          update_url(get_calc_string());
-          //console.log("updated");
-        });
-        //eid("tweaks-json-helper-script").innerText = "console.log('onload'); Calc.observeEvent('change', function () {document.getElementById('tweaks-json-helper-onChange').click()});";
-        const onload = document.createElement('script');
-        onload.innerText = "Calc.observeEvent('change', function () {document.getElementById('tweaks-json-helper-onChange').click()});";
-        eid("tweaks-json-helper-onChange").insertAdjacentElement('afterEnd', onload);
-        // =api observer=
-        {
-          const e = eid("tweaks-api");
-          const o = e.observer = new MutationObserver(muts=>{
-            for (var mut of muts) {
-              //assert(mut.target === e);
-              //assert(mut.type == 'attributes');
-              const k = mut.attributeName;
-              const v = e.getAttribute(k);
-              if (v !== null) {
-                e.removeAttribute(k);
-                TweaksAPICall(k, v);
-              }
-            }
-          });
-          o.observe(e, {'attributes': true, /*attributeFilter: [],*/});
         }
-        return true;
+
+        const children = definition.children;
+        if (children) {
+          for (const child_definition of children) {
+            allSucceeded &&= !!addElement(child_definition, e);
+          }
+        }
+
+        return allSucceeded;
+      }
+      function addRootElement (definition) {
+        const parent = select(definition.parentSelector);
+        return !!(parent && addElement(definition, parent));
+      }
+
+      let allSucceeded = true;
+
+      for (const rootDefinition of elementDefinitions) {
+        allSucceeded &&= !!addRootElement(rootDefinition);
+      }
+
+      if (allSucceeded) {
+        console.log("GOOP");
       } else {
         console.log("EEK");
-        return false;
       }
+      return allSucceeded;
     }
   }
 
@@ -442,9 +566,12 @@ function loadTweaks () {
   }
 
   waitForCalc().then(
-    ()=>timeout_until(addElements, 1000)
+    () => timeout_until(addElements, 1000)
   ).then(
-    ()=>OnLoad()
+    () => {
+      OnLoad();
+      setInterval(addElements, 15000);
+    }
   );
   //} catch () {}
 }
