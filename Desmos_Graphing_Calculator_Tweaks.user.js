@@ -17,8 +17,8 @@
 // Independant one-liners to save/load state from browser console, eg for manual crash recovery.
 //  print to console:   console.log(JSON.stringify(Calc.getState()));
 //  paste into console: Calc.setState(JSON.parse(PASTE_HERE));
-//  save to file:   {const url = URL.createObjectURL(new Blob([JSON.stringify(Calc.getState())], {type:'application/json'})); const a = document.createElement('a'); a.href = url; a.download = "desmos.json"; document.head.appendChild(a); a.click(); a.remove; URL.revokeObjectURL(url);} 
-//  load from file: {const input = document.createElement('input'); input.type = "file"; input.oninput = ev => {const fr = new FileReader(ev.target.files); fr.oninput = s => Calc.setString(JSON.parse(s)); fr.readAsText(ev.target.files[0])}; listen({document, 'click', function () {document.removeEventListener('click', arguments.callee); input.click();  input.remove();});}}
+//  save to file:   { const url = URL.createObjectURL(new Blob([JSON.stringify(Calc.getState())], {type: 'application/json'})); const a = document.createElement('a'); a.href = url; a.download = "desmos.json"; document.head.appendChild(a); a.click(); a.remove; URL.revokeObjectURL(url); } 
+//  load from file: { const input = document.createElement('input'); input.type = 'file'; input.oninput = ev => { const fr = new FileReader(ev.target.files); fr.oninput = s => Calc.setString(JSON.parse(s)); fr.readAsText(ev.target.files[0])}; { listen(document, 'click', function () { document.removeEventListener('click', arguments.callee); input.click(); input.remove(); }); } }
 //   (click anywhere on document to activate)
 
 // Changelog
@@ -177,7 +177,7 @@ function loadTweaks () {
     return encode(get_calc_zipstring());
   }
   function set_calc_string (json) {
-    //Calc.setState(JSON.parse(json), {allowUndo:(function(a){a===undefined?true:a})(tweaks.loadJSON_allowUndo)});
+    //Calc.setState(JSON.parse(json), {allowUndo: (function (a) { return a===undefined? true : a; })(tweaks.loadJSON_allowUndo)});
     setState_proxy.innerText = json;
     setState_proxy.click();
   }
@@ -192,15 +192,15 @@ function loadTweaks () {
       var payload = null;
     } else {
       most_recent_JSON = s;
-      var payload = zip(s).replace(/=/g,"");
+      var payload = zip(s).replace(/=/g, "");
     }
     //document.location.hash = payload;
     //history.replaceState(null, "", "/calculator"+"#"+payload);
     const query = new URLSearchParams(location.search);
     if (payload === null)
-      query.delete("tweaks__calc_state")
+      query.delete('tweaks__calc_state')
     else
-      query.set("tweaks__calc_state",payload);
+      query.set('tweaks__calc_state', payload);
     const loc = `${location.pathname}?${query.toString()}${location.hash}`;
     history.replaceState(null, "", loc);
     //console.log(`url set to ${loc}`);
@@ -209,12 +209,12 @@ function loadTweaks () {
     match = location.search.match(/(?:[?&]tweaks__calc_state=)([^&]*)/);
     return match? unzip(decode(match[1])) : null;
     const query = new URLSearchParams(location.search);
-    return unzip(query.get("tweaks__calc_state"));
+    return unzip(query.get('tweaks__calc_state'));
   }
 
   const onLoadScripts = [
     'window.tweaks_api_call = function tweaks_api_call (k, v) { document.getElementById(\'tweaks-api\').setAttribute(k, v); }',
-    'console.log(\'onload\'); Calc.observeEvent(\'change\', function () {document.getElementById(\'tweaks-json-helper-onChange\').click()});',
+    'console.log(\'onload\'); Calc.observeEvent(\'change\', function () { document.getElementById(\'tweaks-json-helper-onChange\').click() });',
   ];
   function OnLoad () {
     //console.log("OnLoad()");
@@ -226,7 +226,7 @@ function loadTweaks () {
         console.log("Tweaks: Restored calc state from URL.");
       }
     }
-    //Calc.observeEvent('change', function () {update_url(get_calc_string());});
+    //Calc.observeEvent('change', function () { update_url(get_calc_string()); });
     for (const script of onLoadScripts) {
       runPageScript(script);
     }
@@ -234,15 +234,15 @@ function loadTweaks () {
   
   function HandleCloudfrontError () {
     //console.log("HandleCloudfrontError()")
-    const key = "tweaks__bad_calc_state";
+    const key = 'tweaks__bad_calc_state';
     if (document.title == "ERROR: The request could not be satisfied") {
       console.log("Handling Cloudfront error");
       const html = '<div id="tweaks-cloudfront-error-box" hidden>&nbsp;<h1>Tweaks: <span id="tweaks-cloudfront-error-summary"></span></h1><p><span id="tweaks-cloudfront-error-comment">Unknown error.</span></p></div>';
-      const e = eid("tweaks-cloudfront-error-comment");
+      const e = eid('tweaks-cloudfront-error-comment');
       const show = (msg1 = "", msg2 = "") => {
-        eid("tweaks-cloudfront-error-summary").innerText = msg1;
-        eid("tweaks-cloudfront-error-comment").innerText = msg2;
-        eid("tweaks-cloudfront-error-box").hidden = false;
+        eid('tweaks-cloudfront-error-summary').innerText = msg1;
+        eid('tweaks-cloudfront-error-comment').innerText = msg2;
+        eid('tweaks-cloudfront-error-box').hidden = false;
       };
       document.body.insertAdjacentHTML('beforeEnd', html);
 
@@ -291,7 +291,7 @@ function loadTweaks () {
   function CleanupCloudfrontError () {
     //console.log("CleanupCloudfrontError()");
     // Call Cleanup ASAP after page reload, to make sure the URL data isn't lost.
-    const saved = sessionStorage.getItem("tweaks__bad_calc_state");
+    const saved = sessionStorage.getItem('tweaks__bad_calc_state');
     if (saved !== null) {
       const unzipped = unzip(saved);
       console.log(saved);
@@ -302,13 +302,13 @@ function loadTweaks () {
         console.log("Tweaks: Error restoring URL after CloudFront error.");
       } else {
         console.log("Tweaks: Cloudfront error URL restoration successful");
-        sessionStorage.removeItem("tweaks__bad_calc_state");
+        sessionStorage.removeItem('tweaks__bad_calc_state');
       }
     }
   }
   
   function TweaksAPICall (k, v) {
-    switch (k.toLowerCase().replace(/_/g,"")) {
+    switch (k.toLowerCase().replace(/_/g, "")) {
     case 'help': {
       console.log("api commands: getstate getzipstate setstate setzipstate");
     } break;
@@ -368,9 +368,9 @@ function loadTweaks () {
                   clickortouch(b, function (event) {
                     //console.log("clicked save");
                     const s = get_calc_string();
-                    const l = URL.createObjectURL(new Blob([s], {type:'application/json'}));
+                    const l = URL.createObjectURL(new Blob([s], {type: 'application/json'}));
                     e.href = l;
-                    e.download = tweaks.name || 'desmos.json';
+                    e.download = tweaks.name || "desmos.json";
                     e.click();
                   });
                 },
@@ -463,7 +463,7 @@ function loadTweaks () {
 
           // =sshot=
           // {
-          //   'html': '<button id="screenshot-button" onclick="const g=function(n){return document.getElementById(n)},a=g(\'screenshot-link\'),w=g(\'screenshot-width\').value,h=g(\'screenshot-height\').value;a.href=Calc.screenshot({width:w,height:h]);a.hidden=false">Take Screenshot: </button>',
+          //   'html': '<button id="screenshot-button" onclick="const g=function (n){return document.getElementById(n)},a=g(\'screenshot-link\'),w=g(\'screenshot-width\').value,h=g(\'screenshot-height\').value;a.href=Calc.screenshot({width:w,height:h]);a.hidden=false">Take Screenshot: </button>',
           //   'children': [
           //     {
           //       'html': '<input id="screenshot-width" class="screenshot-size-input" type="number" value="512"/>',
@@ -484,14 +484,14 @@ function loadTweaks () {
             'id': 'tweaks-json-helper-getState',
             'html': '<button id="tweaks-json-helper-getState" hidden="true" onclick="this.innerText = JSON.stringify(Calc.getState());"></button>',
             'setup': e => {
-              getState_proxy = eid("tweaks-json-helper-getState");
+              getState_proxy = eid('tweaks-json-helper-getState');
             },
           },
           {
             'id': 'tweaks-json-helper-setState',
-            'html': '<button id="tweaks-json-helper-setState" hidden="true" onclick="Calc.setState(JSON.parse(this.innerText, {allowUndo:true}));"></button>',
+            'html': '<button id="tweaks-json-helper-setState" hidden="true" onclick="Calc.setState(JSON.parse(this.innerText, {allowUndo: true}));"></button>',
             'setup': e => {
-              setState_proxy = eid("tweaks-json-helper-setState");
+              setState_proxy = eid('tweaks-json-helper-setState');
             },
           },
           {
