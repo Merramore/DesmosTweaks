@@ -307,7 +307,7 @@ function loadTweaks () {
     const icon_copy  = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAXElEQVQ4jd2SzQrAIAyDP/YIvrKyZ169uNvwsGj9gcEChUJIGmhgE07AgNIYA5IyMCB0jgTgUmRxJpVpRgxe04waPPvhFEr8yCDj64EpMuFrYqw08nPLrZxJ8yFuJ3UvowhAfiMAAAAASUVORK5CYII";
     const icon_paste = "data:image/png;base64,"+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAi0lEQVQ4jbWSUQqAIBBEn9EJukOnjP6ii2X36TODsp8ssxWlaEBw3dnRWRd+RANMQJtb0AMGsN6qg9gAXUzAANWxt0HOxRUw+wkVkFRQIHF9HmXkNSpy/kCRS3wrMHJvorOmJbLke40In9zfLXwWSP6GL7BwDVIKUr/oeI6ySAS2zIvQgqAFhlyBJHa/ICmusFqwdgAAAABJRU5ErkJggg";
     const html = (
-      '<span>'+
+      '<span id="tweaks-buttons">'+
         '<button id="tweaks-json-saver" class="tweaks-json-button" onclick=""><img alt="Save JSON" src="'+icon_save+'"></img></button>'+
         '<a id="tweaks-json-save-link" href="" target="_blank" download="desmos.json" hidden="true">Save JSON</img></a>'+
         
