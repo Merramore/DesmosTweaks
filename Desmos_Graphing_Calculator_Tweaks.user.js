@@ -10,7 +10,7 @@
 // @include     https://www.desmos.com/3d?*
 // @run-at      document-idle
 // @author      [AM]
-// @version     20240325
+// @version     20240328
 // @grant       none
 // ==/UserScript==
 
@@ -22,6 +22,8 @@
 //   (click anywhere on document to activate)
 
 // Changelog
+// 20240328
+//  Load URL state on 3d page.
 // 20240325
 //  Error reporting and formatting.
 // 20240324
@@ -218,9 +220,13 @@ function loadTweaks () {
     'window.tweaks_api_call = function tweaks_api_call (k, v) { document.getElementById(\'tweaks-api\').setAttribute(k, v); }',
     'console.log(\'onload\'); Calc.observeEvent(\'change\', function () { document.getElementById(\'tweaks-json-helper-onChange\').click() });',
   ];
+  const knownLocations = [
+    "/calculator",
+    "/3d",
+  ];
   function OnLoad () {
     //console.log("OnLoad()");
-    if(location.pathname == "/calculator") {
+    if(knownLocations.includes(location.pathname)) {
       const saved = state_from_url();
       if (saved) {
         console.log(saved);
