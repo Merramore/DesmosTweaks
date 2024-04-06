@@ -10,7 +10,7 @@
 // @include     https://www.desmos.com/3d?*
 // @run-at      document-idle
 // @author      [AM]
-// @version     20240328
+// @version     20240405
 // @grant       none
 // ==/UserScript==
 
@@ -22,6 +22,8 @@
 //   (click anywhere on document to activate)
 
 // Changelog
+// 20240405
+//  Fix runPageScript().
 // 20240328
 //  Load URL state on 3d page.
 // 20240325
@@ -128,14 +130,12 @@ function loadTweaks () {
   var _runPageScriptElement = null;
   function runPageScript (source) {
     try {
-      _runPageScriptElement.innerHtml = source;
+      const script = document.createElement('script');
+      script.setAttribute('type', "text/javascript");
+      script.innerHTML = source;
+      _runPageScriptElement.appendChild(script);
     } catch (err) {
       console.error(err);
-    } finally {
-      try {
-        _runPageScriptElement.innerHtml = '';
-      } finally {
-      }
     }
   }
   
@@ -514,7 +514,7 @@ function loadTweaks () {
           },
           {
             'id': 'tweaks-json-script-helper',
-            'html': '<script id="tweaks-json-script-helper" type="text/javascript"></script>',
+            'html': '<div id="tweaks-json-script-helper"></div>',
             'setup': e => { // tweaks-json-helper-script
               _runPageScriptElement = e;
             },
